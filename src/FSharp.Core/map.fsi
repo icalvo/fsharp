@@ -40,8 +40,11 @@ type Map<[<EqualityConditionalOn>] 'Key, [<EqualityConditionalOn; ComparisonCond
     /// <param name="f">The change function.</param>
     ///
     /// <returns>The resulting map.</returns>
-    ///
-    /// <example id="member-change-1">
+    /// <remarks>If the key exists, the change function is provided with <c>Some value</c>.
+    /// Otherwise is provided with <c>None</c>. If the change function returns <c>Some value</c>, the key
+    /// is updated with the new value. Otherwise, the key is removed.
+    /// </remarks>
+    /// <example id="member-change-1">  Updating
     /// <code lang="fsharp">
     /// let sample = Map [ (1, "a"); (2, "b") ]
     ///
@@ -51,6 +54,30 @@ type Map<[<EqualityConditionalOn>] 'Key, [<EqualityConditionalOn; ComparisonCond
     ///     | None -> None
     ///
     /// sample.Change (1, f) // evaluates to map [(1, "az"); (2, "b")]
+    /// </code>
+    /// </example>
+    /// <example id="member-change-2"> Removing
+    /// <code lang="fsharp">
+    /// let sample = Map [ (1, "a"); (2, "b") ]
+    ///
+    /// let f x =
+    ///     match x with
+    ///     | Some _ -> None
+    ///     | None -> None
+    ///
+    /// sample.Change (2, f) // evaluates to map [(1, "a")]
+    /// </code>
+    /// </example>
+    /// <example id="member-change-3"> Inserting
+    /// <code lang="fsharp">
+    /// let sample = Map [ (1, "a"); (2, "b") ]
+    ///
+    /// let f x =
+    ///     match x with
+    ///     | Some s -> Some s
+    ///     | None -> Some "c"
+    ///
+    /// sample.Change (3, f) // evaluates to map [(1, "a"); (2, "b"); (3, "c")]
     /// </code>
     /// </example>
     member Change: key: 'Key * f: ('Value option -> 'Value option) -> Map<'Key, 'Value>
@@ -248,8 +275,13 @@ module Map =
     /// <param name="table">The input map.</param>
     ///
     /// <returns>The resulting map.</returns>
+    /// 
+    /// <remarks>If the key exists, the change function is provided with <c>Some value</c>.
+    /// Otherwise is provided with <c>None</c>. If the change function returns <c>Some value</c>, the key
+    /// is updated with the new value. Otherwise, the key is removed.
+    /// </remarks>
     ///
-    /// <example id="change-1">
+    /// <example id="change-1"> Updating
     /// <code lang="fsharp">
     /// let input = Map [ (1, "a"); (2, "b") ]
     ///
@@ -258,6 +290,28 @@ module Map =
     ///     | Some s -> Some (s + "z")
     ///     | None -> None
     /// ) // evaluates to map [(1, "az"); (2, "b")]
+    /// </code>
+    /// </example>
+    /// <example id="change-2"> Removing
+    /// <code lang="fsharp">
+    /// let input = Map [ (1, "a"); (2, "b") ]
+    ///
+    /// input |> Map.change 2 (fun x ->
+    ///     match x with
+    ///     | Some _ -> None
+    ///     | None -> None
+    /// ) // evaluates to map [(1, "a")]
+    /// </code>
+    /// </example>
+    /// <example id="change-3"> Inserting
+    /// <code lang="fsharp">
+    /// let input = Map [ (1, "a"); (2, "b") ]
+    ///
+    /// input |> Map.change 3 (fun x ->
+    ///     match x with
+    ///     | Some s -> Some s
+    ///     | None -> Some "c"
+    /// ) // evaluates to map [(1, "a"); (2, "b"); (3, "c")]
     /// </code>
     /// </example>
     [<CompiledName("Change")>]
